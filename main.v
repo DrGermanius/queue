@@ -8,22 +8,28 @@ __global (
 )
 
 struct Queue {
-	mut:
-	m map[string]chan string
+mut:
+	m map[string][]chan string
 }
+
 fn (mut q Queue) add(q_name string, v string) {
 	_ = q.m[q_name] or {
-		q.m[q_name] = chan string{cap: 100}
-		q.m[q_name] <- v
+		ch := chan string{cap: 100}
+		ch <- v
+		q.m[q_name] << ch
 		return
 	}
-	q.m[q_name] <- v
+	if q.m[q_name].len > 1 {
+		q.m[q_name][1] <- v
+		return
+	}
+	q.m[q_name][0] <- v
 }
 
 fn (mut q Queue) pop(q_name string) !string {
-	ch := q.m[q_name] or { return NotFoundError{} }
+	chlist := q.m[q_name] or { return NotFoundError{} }
 	mut item := ''
-	state := ch.try_pop(mut item)
+	state := chlist.first().try_pop(mut item)
 	if state == ChanState.not_ready || state == ChanState.closed {
 		return NotFoundError{}
 	}
@@ -31,9 +37,18 @@ fn (mut q Queue) pop(q_name string) !string {
 }
 
 fn (mut q Queue) wait(sec int, q_name string) !string {
-	ch := q.m[q_name] or { return NotFoundError{} }
+	_ := q.m[q_name] or { return NotFoundError{} }
+	ch := chan string{}
+	q.m[q_name] << ch
+	defer {
+		q.m[q_name].delete(q.m[q_name].index(ch))
+	}
+	mut item := ''
 	select {
-		item := <-ch {
+		item = <-q.m[q_name][0] {
+			return item
+		}
+		item = <-ch {
 			return item
 		}
 		sec * time.second {
