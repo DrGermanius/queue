@@ -7,7 +7,7 @@ mut:
 	m map[string][]chan string
 }
 
-struct NotFoundError {
+pub struct NotFoundError {
 	Error
 }
 
