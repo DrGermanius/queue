@@ -31,4 +31,6 @@ jobs:
         run: v -enable-globals .
 
       - name: Run Tests
-        run: v -enable-globals test .
+        run: | 
+          v -enable-globals test ./server
+          v -enable-globals test ./queue
