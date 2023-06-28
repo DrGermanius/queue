@@ -2,11 +2,10 @@ import queue
 import net.http
 import server
 import sync
-import time
 
 fn test_server() {
-	q := queue.Queue{}
-	f := fn (q queue.Queue) {
+	q := q.Queue{}
+	f := fn (q q.Queue) {
 		server.run_server(q) or { panic(err) }
 	}
 	spawn f(q)
@@ -37,7 +36,7 @@ fn test_server() {
 	assert res.body.contains('2')
 	assert !res.body.contains('1')
 
-	// q is empty
+	// queue is empty
 	res = http.get('http://localhost:8081/another') or { panic(err) }
 	assert res.status_code == 404
 
@@ -75,7 +74,7 @@ fn test_server() {
 	//
 	// wg.wait()
 	//
-	// if nothing written to q
+	// if nothing written to queue
 	wg.add(1)
 	spawn fn [mut wg] () {
 		r := http.get('http://localhost:8081/test?timeout=2') or { panic(err) }
@@ -84,7 +83,7 @@ fn test_server() {
 	}()
 	wg.wait()
 	//
-	// if something has already written to q
+	// if something has already written to queue
 	res = http.put('http://localhost:8081/test?v=1', '') or { panic(err) }
 	assert res.status_code == 200
 

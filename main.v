@@ -1,9 +1,8 @@
 module main
 
 import server
-import queue
+import q
 
 fn main() {
-	mut q := queue.Queue{}
-	server.run_server(q)!
+	server.run_server( q.Queue{})!
 }

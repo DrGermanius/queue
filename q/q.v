@@ -1,4 +1,4 @@
-module queue
+module q
 
 import time
 

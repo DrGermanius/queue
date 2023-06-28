@@ -28,4 +28,4 @@ jobs:
       - name: Run Tests
         run: | 
           v -enable-globals test ./server
-          v -enable-globals test ./queue
+          v -enable-globals test ./q
