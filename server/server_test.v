@@ -1,14 +1,14 @@
-import queue
 import net.http
 import server
 import sync
+import q
 
 fn test_server() {
-	q := q.Queue{}
-	f := fn (q q.Queue) {
-		server.run_server(q) or { panic(err) }
+	qq := q.Queue{}
+	f := fn (qq q.Queue) {
+		server.run_server(qq) or { panic(err) }
 	}
-	spawn f(q)
+	spawn f(qq)
 
 	// putting values
 	mut res := http.put('http://localhost:8081/test?v=1', '') or { panic(err) }
